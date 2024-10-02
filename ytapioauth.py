@@ -88,13 +88,17 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.redirect(flask.url_for('index'))
+    return flask.redirect('/PlaylistExporter')
 
 def channels_list_by_username(client, **kwargs):
 
     response = client.channels().list(**kwargs).execute()
 
     return flask.jsonify(**response)
+
+@app.route('/PlaylistExporter')
+def exporterpage():
+    return '<p>Welcome!</p>'
 
 
 if __name__ == '__main__':
