@@ -1,4 +1,3 @@
-from pytube import YouTube
 import requests
 from requests import post
 import base64
@@ -23,6 +22,7 @@ load_dotenv()
 clientID = os.getenv('clientID')
 clientSecret = os.getenv('clientSecret')
 
+
 # Youtube Data API 3 key AIzaSyB8vC1kJfXRW_5v0df9JBf4u9uuVwmwUOs
 # Youtube Api being used to get video id from search
 def getYT(search):
@@ -42,7 +42,6 @@ def getYT(search):
     except Exception as e:
         print("An error occurred during YouTube search:", e)
         return 'null'
-
 
 # pytube used to download video
 # use return value of id from the getID function for the num parameter
@@ -72,7 +71,7 @@ def getSpotifyToken():
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": "Basic " + encoded
     }
- 
+
     payload = {
         "grant_type": "client_credentials"
     }
@@ -106,8 +105,8 @@ def getTrackIDS(token, link):
     if num_tracks % 50 > 1:
         loop += 1
     for i in range(loop): # loop through requests 50 at a time while adding to offset
-        query_url + "?limit=50&offset={}"
-        query_url.format(offset)
+        query_url = query_url + "?limit=50&offset={}".format(offset)
+        
         result = requests.get(query_url, headers=headers)
         json_result = json.loads(result.content)
         for j in range(50):
@@ -118,7 +117,7 @@ def getTrackIDS(token, link):
         head, sep, tail = query_url.partition("?")
         query_url = head
         offset += 50
-        
+
 def trackSearch(id):
     url = "https://api.spotify.com/v1/tracks/"
     query_url = url + id
@@ -130,7 +129,6 @@ def trackSearch(id):
     artist = json_result['artists'][0]['name']
     search = name + " by " + artist
     return search
-  
 
 def main(link):
     token = getSpotifyToken()
@@ -154,16 +152,14 @@ def main(link):
     return 0
 
 def spotifyOnly():
-    link = input("Paste Spotify Link Here: ")
+    link = playlist_link
     token = getSpotifyToken()
     getTrackIDS(token, link)
-    print(track_id_list)
-    videoidlist = []
-    for songID in track_id_list:
-        search = trackSearch(songID)
-        print(search)
-        # videoID = getYT(search)
-        # videoidlist.append(videoID)
+
+    videoidlist = [trackSearch(song_id) for song_id in track_id_list]
+    print(videoidlist)
+    print(videoidlist)
+    return videoidlist
 
 spotifyOnly()
 

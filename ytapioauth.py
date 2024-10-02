@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# from spotifyScraper import spotifyOnly
+
 import os
 
 import flask
@@ -90,15 +92,14 @@ def oauth2callback():
 
     return flask.redirect('/PlaylistExporter')
 
-def channels_list_by_username(client, **kwargs):
-
-    response = client.channels().list(**kwargs).execute()
-
-    return flask.jsonify(**response)
-
 @app.route('/PlaylistExporter')
-def exporterpage():
-    return '<p>Welcome!</p>'
+def playlistExporter():
+    # call playlist scraper spotify only function
+    return '<p>Lorem Ipsum</p>'
+
+def channels_list_by_username(client, **kwargs):
+    response = client.channels().list(**kwargs).execute()
+    return flask.jsonify(**response)
 
 
 if __name__ == '__main__':
