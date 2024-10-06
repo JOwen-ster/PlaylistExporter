@@ -14,16 +14,16 @@
   <p class="text-center text-2xl mt-5">Start Converting Your Playlists here!</p>
   <div class="bg-white opacity-50 w-1/2 h-96 mx-auto mt-5 rounded-lg flex flex-row justify-between p-10 m-auto">
     <div class=" h-full">
-      <a href="/auth/spotify" class="text-2xl text-center text-black">Login with Spotify</a>
+      <a href="/auth/spotify" class="md:text-2xl text-center text-black">Login with Spotify</a>
     </div>
 
     <div class=" h-full">
-      <a href="/auth/youtube" class="text-2xl text-center text-black">Login with Youtube</a>
+      <a href="/auth/youtube" class="md:text-2xl text-center text-black">Login with Youtube</a>
     </div>
 
   </div>
 
-  <p class="text-center text-xl mt-16 mb-5">
+  <p class="text-center md:text-xl mt-16 mb-5">
     Here is a song recommendation while you login!
   </p>
 
