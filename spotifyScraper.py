@@ -4,6 +4,8 @@ import base64
 import json
 from dotenv import load_dotenv
 import os
+from pytube import YouTube
+from googleapiclient.discovery import build
 
 
 # IMPORTANT Global Variables 
@@ -21,17 +23,21 @@ not_found = []
 load_dotenv()
 clientID = os.getenv('clientID')
 clientSecret = os.getenv('clientSecret')
+googleSecret = os.getenv('googleKey')
 
 
-# Youtube Data API 3 key AIzaSyB8vC1kJfXRW_5v0df9JBf4u9uuVwmwUOs
+# Youtube Data API 3 key 
 # Youtube Api being used to get video id from search
 def getYT(search):
     global not_found
-    api_url = 'https://www.googleapis.com/youtube/v3/search?key=YOUR_API_KEY&part=snippet&q={}r&type=video'
-    api_url = api_url.format(search)
+    api_url = F'https://www.googleapis.com/youtube/v3/search?key={googleSecret}&part=snippet&q={search}r&type=video'
+    print(api_url)
+    youtube = build('youtube', 'v3', developerKey=googleSecret)
     try:
+        response = youtube.search().list(q='search', part='id,snippet', maxResults=1)
         data = requests.get(api_url)
         results = data.json()
+        print(results)
         searchHits = results['pageInfo']['totalResults']
         if searchHits > 0:
             videoID = results['items'][0]['id']['videoId']
@@ -48,9 +54,10 @@ def getYT(search):
 def downloadVid(num):
     if num != 'null':
         url = "https://www.youtube.com/watch?v=" + num
+        print(url)
         video = YouTube(url)
         video = video.streams.get_highest_resolution()
-        video.download(output_path="/home/patrick/Documents/Downloaded_Songs")
+        video.download(output_path=r"C:\Users\osterling\Documents\GitHub\PlaylistExporter\YTVideos")
     else:
         return
 
@@ -138,15 +145,19 @@ def main(link):
     videoidlist = []
     for songID in track_id_list:
         search = trackSearch(songID)
+        print(search)
         videoID = getYT(search)
+        print(videoID)
         videoidlist.append(videoID)
+        downloadVid(videoID)
     print("These are all the songs from the Playlist")
     print(videoidlist)
     
-    filesToMp3()
-    print(track_id_list)
-    print(videoidlist)
-    print("These songs couldn't be downloaded")
+    
+    # filesToMp3()
+    # print(track_id_list)
+    # print(videoidlist)
+    # print("These songs couldn't be downloaded")
 
     print(not_found)
     return 0
@@ -161,6 +172,6 @@ def spotifyOnly():
     print(videoidlist)
     return videoidlist
 
-spotifyOnly()
+# spotifyOnly()
 
-# main(playlist_link)
+main(playlist_link)
