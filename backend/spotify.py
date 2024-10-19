@@ -36,7 +36,7 @@ def login_user():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET, redirect_uri=redirect_uri, scope=scope))
     return sp
 
-def getUserPlaylists():
+def return_all_playlists():
     """Returns a dictionary of the user's playlist names and link."""
 
     sp = login_user()
