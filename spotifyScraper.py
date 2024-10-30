@@ -30,14 +30,14 @@ googleSecret = os.getenv('googleKey')
 # Youtube Api being used to get video id from search
 def getYT(search):
     global not_found
-    api_url = F'https://www.googleapis.com/youtube/v3/search?key={googleSecret}&part=snippet&q={search}r&type=video'
-    print(api_url)
+    api_url = F'https://www.googleapis.com/youtube/v3/search?key={googleSecret}&part=snippet&q={search}r&type=video&maxResults=1'
     youtube = build('youtube', 'v3', developerKey=googleSecret)
     try:
-        response = youtube.search().list(q='search', part='id,snippet', maxResults=1)
+        # results = youtube.search().list(q='search', part='id,snippet', maxResults=1)
+        # print(results)
         data = requests.get(api_url)
         results = data.json()
-        print(results)
+        # print(results)
         searchHits = results['pageInfo']['totalResults']
         if searchHits > 0:
             videoID = results['items'][0]['id']['videoId']
@@ -46,6 +46,7 @@ def getYT(search):
             return 'null'
         return videoID
     except Exception as e:
+        print(results)
         print("An error occurred during YouTube search:", e)
         return 'null'
 
@@ -145,11 +146,11 @@ def main(link):
     videoidlist = []
     for songID in track_id_list:
         search = trackSearch(songID)
-        print(search)
         videoID = getYT(search)
-        print(videoID)
-        videoidlist.append(videoID)
-        downloadVid(videoID)
+        if videoID != "null":
+            videoidlist.append(videoID)
+            print("https://www.youtube.com/watch?v="+ videoID)
+        # downloadVid(videoID)
     print("These are all the songs from the Playlist")
     print(videoidlist)
     
