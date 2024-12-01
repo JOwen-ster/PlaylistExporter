@@ -1,6 +1,5 @@
 import spotipy
 import os
-import sys
 from dotenv import load_dotenv
 from spotipy.oauth2 import SpotifyOAuth
 from dataclasses import dataclass
@@ -78,11 +77,3 @@ def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
         all_user_songs.append(SpotifySong(artist_name=artist_name, song_name=song_name))
 
     return all_user_songs
-
-
-"""
-TODO:
-def login_user()
-def return_all_playlists()
-def send_user_playlist()
-"""
