@@ -50,3 +50,6 @@ The app is designed to make the playlist conversion process as straightforward a
 - **Dynamic Playlist Creation:** Automatically generates and saves a YouTube playlist with the selected songs.
 - **Responsive Design:** Enjoy a user-friendly interface on both desktop and mobile devices.
 
+---
+
+Developed by [Sama Ahmed](https://github.com/26samaahmed), [Boushra Bettir](https://github.com/boushrabettir), [James Owen Sterling](https://github.com/JOwen-ster), [Patrick Smith](https://github.com/thisguyblink) ✨
