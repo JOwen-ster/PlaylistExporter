@@ -3,12 +3,17 @@
 # from spotifyScraper import spotifyOnly
 
 import os
+from time import sleep
 
 import flask
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
+
+from urllib.parse import urlparse, parse_qs
+
+from YTMutator import YouTubeMutator
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -27,6 +32,7 @@ app = flask.Flask(__name__)
 # key. See http://flask.pocoo.org/docs/0.12/quickstart/#sessions.
 app.secret_key = os.urandom(12)
 
+youtube_manager = None
 
 @app.route('/')
 def index():
@@ -37,10 +43,13 @@ def index():
     credentials = google.oauth2.credentials.Credentials(
         **flask.session['credentials'])
 
-    client = googleapiclient.discovery.build(
+    youtube_instance = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    return channels_list_by_username(client,
+    global youtube_manager
+    youtube_manager = YouTubeMutator(youtube_instance)
+
+    return channels_list_by_username(youtube_instance,
         part='snippet,contentDetails,statistics',
         forUsername='GoogleDevelopers')
 
@@ -61,7 +70,6 @@ def authorize():
     # Store the state in the session so that the callback can verify that
     # the authorization server response.
     flask.session['state'] = state
-
     return flask.redirect(authorization_url)
 
 
@@ -95,12 +103,33 @@ def oauth2callback():
 @app.route('/PlaylistExporter')
 def playlistExporter():
     # call playlist scraper spotify only function
+    
+    # Load the credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(
+        **flask.session['credentials'])
+
+    youtube_instance = googleapiclient.discovery.build(
+        API_SERVICE_NAME, API_VERSION, credentials=credentials)
+
+    global youtube_manager
+    if not youtube_manager:
+        youtube_manager = YouTubeMutator(youtube_instance)
+
+    created_playlist = youtube_manager.createUserPlaylist(playlist_name='TESTING_API')
+
+    youtube_manager.addSongToUserPlaylist(
+        playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),
+        url='https://www.youtube.com/watch?v=-OkrC6h2H5k'
+    )
+
+    view = youtube_manager.getUserPlaylist('TESTING_API')
+    youtube_manager.updateUserPlaylistInfo(playlist_object=view)
+
     return '<p>Lorem Ipsum</p>'
 
 def channels_list_by_username(client, **kwargs):
     response = client.channels().list(**kwargs).execute()
     return flask.jsonify(**response)
-
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
