@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# from spotifyScraper import spotifyOnly
-
 import os
 from time import sleep
 
@@ -117,13 +113,13 @@ def playlistExporter():
 
     created_playlist = youtube_manager.createUserPlaylist(playlist_name='TESTING_API')
 
-    youtube_manager.addSongToUserPlaylist(
-        playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),
-        url='https://www.youtube.com/watch?v=-OkrC6h2H5k'
-    )
+    #youtube_manager.addSongToUserPlaylist(
+       # playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),
+       # url='https://www.youtube.com/watch?v=-OkrC6h2H5k'
+   # )
 
-    view = youtube_manager.getUserPlaylist('TESTING_API')
-    youtube_manager.updateUserPlaylistInfo(playlist_object=view)
+    #view = youtube_manager.getUserPlaylist('TESTING_API')
+   # youtube_manager.updateUserPlaylistInfo(playlist_object=view)
 
     return '<p>Lorem Ipsum</p>'
 
