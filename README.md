@@ -8,7 +8,7 @@
 
 - **Backend:** Python and Flask handle the application’s server-side logic and API interactions.
 - **Frontend:** The interface is built using Svelte for dynamic UI updates and styled with Tailwind CSS for a sleek, responsive design.
-- **APIs:** The Spotify API (via the Spotipy library) fetches playlist data, and the YouTube Data API is used to search and manage videos on YouTube.
+- **APIs:** The Spotify API (via the Spotipy library) fetches playlist data, and the YouTube Data API is used to search and manage videos on YouTube along with create a playlist and add to it.
 - **Authentication:** OAuth 2.0 ensures a secure and seamless login experience for both platforms.
 
 ---
