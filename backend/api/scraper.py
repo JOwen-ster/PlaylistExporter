@@ -1,25 +1,16 @@
 import requests
-from requests import post
-import base64
-import json
 from dotenv import load_dotenv
+import sys
 import os
-from googleapiclient.discovery import build
+import spotify
 
-
-
-# IMPORTANT Global Variables 
-# Working is Testing API Calls
 
 # Test link to be used later
 playlist_link = "https://open.spotify.com/playlist/2lBQEVNJIvSMT7q3T0GtZ8?si=ae4fa00666c04e70"
-# Making variables to be global bc they are used in different functions
 playlist_id = " "
 token = " "
 track_id_list = []
 not_found = []
-# clientID = os.getenv('clientID')
-# clientSecret = os.getenv('clientSecret')
 load_dotenv()
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
@@ -28,28 +19,66 @@ googleSecret = os.getenv('googleKey')
 
 # Youtube Data API 3 key 
 # Youtube Api being used to get video id from search
-def getYT(search):
-    global not_found
-    api_url = F'https://www.googleapis.com/youtube/v3/search?key={googleSecret}&part=snippet&q={search}r&type=video&maxResults=1'
-    youtube = build('youtube', 'v3', developerKey=googleSecret)
-    try:
-        # results = youtube.search().list(q='search', part='id,snippet', maxResults=1)
-        # print(results)
-        data = requests.get(api_url)
-        results = data.json()
-        # print(results)
-        searchHits = results['pageInfo']['totalResults']
-        if searchHits > 0:
-            videoID = results['items'][0]['id']['videoId']
-        else:
-            not_found.append(search)
-            return 'null'
-        return videoID
-    except Exception as e:
-        print(results)
-        print("An error occurred during YouTube search:", e)
-        return 'null'
 
+import requests
+
+def get_yt_links(search_object, google_api_key):
+    """
+    Searches for YouTube video links based on a list of Spotify songs.
+    
+    Args:
+        search_object (list[SpotifySong]): A list of SpotifySong objects with artist and song_name attributes.
+        google_api_key (str): Your YouTube Data API key.
+    
+    Returns:
+        dict: A dictionary containing 'youtube_links' (list of links) and 'not_found' (list of failed searches).
+    """
+    youtube_links = []
+    not_found = []
+
+    base_url = "https://www.googleapis.com/youtube/v3/search"
+    
+    for song in search_object:
+        artist = song.artist_name
+        song_name = song.song_name
+        search_query = f"{song_name} by {artist}"
+        
+        params = {
+            "key": google_api_key,
+            "part": "snippet",
+            "q": search_query,
+            "type": "video",
+            "maxResults": 1
+        }
+        
+        try:
+            response = requests.get(base_url, params=params)
+            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+            results = response.json()
+            
+            # Validate response structure
+            if results.get("pageInfo", {}).get("totalResults", 0) > 0:
+                video_id = results["items"][0]["id"]["videoId"]
+                youtube_links.append(f"https://www.youtube.com/watch?v={video_id}")
+            else:
+                not_found.append(search_query)
+        except requests.exceptions.RequestException as e:
+            print(f"Error during YouTube search for '{search_query}': {e}")
+            not_found.append(search_query)
+    
+    return {
+        "youtube_links": youtube_links,
+        "not_found": not_found
+    }
+
+
+spotifySongs = spotify.send_user_playlist("si playlist")
+
+youtubeLinks = get_yt_links(spotifySongs, googleSecret)
+
+print(youtubeLinks)
+
+'''
 def getSpotifyToken():
     encoded = base64.b64encode((SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET).encode("ascii")).decode("ascii")
 
@@ -154,3 +183,5 @@ def spotifyOnly():
 # spotifyOnly()
 
 main(playlist_link)
+
+'''

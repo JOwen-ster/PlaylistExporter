@@ -14,13 +14,6 @@ class SpotifySong:
     song_name: str
 
 
-@dataclass
-class SpotifyUtilizer:
-    """Holds a list of SpotifySong objects."""
-
-    list_of_songs: List[SpotifySong]
-
-
 load_dotenv()
 
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
@@ -33,7 +26,7 @@ user_playlists = {}
 
 def login_user():
     """Logs in the user to Spotify."""
-
+    
     sp = spotipy.Spotify(
         auth_manager=SpotifyOAuth(
             client_id=SPOTIFY_CLIENT_ID,
@@ -42,23 +35,21 @@ def login_user():
             scope=scope,
         )
     )
+    global user_playlists
+    user_playlists = {playlist["name"]: playlist["href"]
+                    for playlist in sp.current_user_playlists()["items"]}
     return sp
-
-
-def return_all_playlists():
-    """Returns a dictionary of the user's playlist names and link."""
-
-    sp = login_user()
-    playlists = sp.current_user_playlists()
-    for playlist in playlists["items"]:
-        user_playlists[playlist["name"]] = playlist["href"]
-    return user_playlists
 
 
 def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
     """Returns a list of SpotifySong objects containing song and artist names from the specified playlist."""
 
     sp = login_user()
+    playlists = sp.current_user_playlists()
+    for playlist in playlists["items"]:
+        user_playlists[playlist["name"]] = playlist["href"]
+
+        
     if playlist_name not in user_playlists:
         raise ValueError("Playlist not found.")
 
@@ -77,6 +68,3 @@ def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
         all_user_songs.append(SpotifySong(artist_name=artist_name, song_name=song_name))
 
     return all_user_songs
-
-
-print(send_user_playlist("si playlist"))  # Example usage
