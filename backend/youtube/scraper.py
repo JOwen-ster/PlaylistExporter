@@ -1,64 +1,156 @@
+import requests
+from requests import post
+import base64
+import json
+from dotenv import load_dotenv
 import os
 from googleapiclient.discovery import build
-from spotify.spotify import SpotifySong, get_spotify_playlist_songs  # Import from the first file
-
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 
-def youtube_search(video_query: str) -> str:
-    """Searches YouTube for a video matching the query."""
-    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
-    request = youtube.search().list(
-        q=video_query, part="snippet", maxResults=1, type="video"
-    )
-    response = request.execute()
-    items = response.get("items", [])
 
-    if not items:
-        return None
+# IMPORTANT Global Variables 
+# Working is Testing API Calls
 
-    return items[0]["id"]["videoId"]
-
-
-def create_youtube_playlist(title: str, description: str = "") -> str:
-    """Creates a YouTube playlist."""
-    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
-    request = youtube.playlists().insert(
-        part="snippet,status",
-        body={
-            "snippet": {"title": title, "description": description},
-            "status": {"privacyStatus": "private"},
-        },
-    )
-    response = request.execute()
-    return response["id"]
+# Test link to be used later
+playlist_link = "https://open.spotify.com/playlist/2lBQEVNJIvSMT7q3T0GtZ8?si=ae4fa00666c04e70"
+# Making variables to be global bc they are used in different functions
+playlist_id = " "
+token = " "
+track_id_list = []
+not_found = []
+# clientID = os.getenv('clientID')
+# clientSecret = os.getenv('clientSecret')
+load_dotenv()
+SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+googleSecret = os.getenv('googleKey')
 
 
-def add_to_youtube_playlist(playlist_id: str, video_id: str):
-    """Adds a video to a YouTube playlist."""
-    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
-    youtube.playlistItems().insert(
-        part="snippet",
-        body={
-            "snippet": {
-                "playlistId": playlist_id,
-                "resourceId": {"kind": "youtube#video", "videoId": video_id},
-            }
-        },
-    ).execute()
-
-
-def spotify_to_youtube(spotify_playlist_name: str, youtube_playlist_name: str):
-    """Transfers songs from a Spotify playlist to a YouTube playlist."""
-    spotify_songs = get_spotify_playlist_songs(spotify_playlist_name)
-    youtube_playlist_id = create_youtube_playlist(youtube_playlist_name)
-
-    for song in spotify_songs:
-        query = f"{song.song_name} by {song.artist_name}"
-        video_id = youtube_search(query)
-
-        if video_id:
-            add_to_youtube_playlist(youtube_playlist_id, video_id)
-            print(f"Added {query} to YouTube playlist.")
+# Youtube Data API 3 key 
+# Youtube Api being used to get video id from search
+def getYT(search):
+    global not_found
+    api_url = F'https://www.googleapis.com/youtube/v3/search?key={googleSecret}&part=snippet&q={search}r&type=video&maxResults=1'
+    youtube = build('youtube', 'v3', developerKey=googleSecret)
+    try:
+        # results = youtube.search().list(q='search', part='id,snippet', maxResults=1)
+        # print(results)
+        data = requests.get(api_url)
+        results = data.json()
+        # print(results)
+        searchHits = results['pageInfo']['totalResults']
+        if searchHits > 0:
+            videoID = results['items'][0]['id']['videoId']
         else:
-            print(f"Could not find {query} on YouTube.")
+            not_found.append(search)
+            return 'null'
+        return videoID
+    except Exception as e:
+        print(results)
+        print("An error occurred during YouTube search:", e)
+        return 'null'
+
+def getSpotifyToken():
+    encoded = base64.b64encode((SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET).encode("ascii")).decode("ascii")
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Basic " + encoded
+    }
+
+    payload = {
+        "grant_type": "client_credentials"
+    }
+    response = requests.post("https://accounts.spotify.com/api/token", data=payload, headers=headers, auth=(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET))
+    json_response = json.loads(response.content)
+    global token 
+    token = json_response["access_token"]
+    return token
+    
+
+def getAuthHeader(token):
+    return {"Authorization": "Bearer " + token}
+
+def getTrackIDS(token, link): 
+    global track_id_list
+    # Spotify api setup and authentication
+    playlist_url = "https://api.spotify.com/v1/playlists/"
+    headers = getAuthHeader(token)
+    
+    playlist_id = link.split("playlist/")[1]
+    head, sep, tail = playlist_id.partition("?")
+    playlist_id = head
+    query_url = playlist_url + playlist_id + "/tracks"
+    offset = 0
+    total = 0
+    result = requests.get(query_url, headers=headers)
+    json_result = json.loads(result.content)
+    total_songs = 0
+    num_tracks = json_result['total']
+    loop = int(num_tracks / 50)
+    if num_tracks % 50 > 1:
+        loop += 1
+    for i in range(loop): # loop through requests 50 at a time while adding to offset
+        query_url = query_url + "?limit=50&offset={}".format(offset)
+        
+        result = requests.get(query_url, headers=headers)
+        json_result = json.loads(result.content)
+        for j in range(50):
+            if num_tracks > 0:
+                track_id_list.append(json_result['items'][j]['track']['id'])
+                num_tracks -= 1
+                total_songs += 1
+        head, sep, tail = query_url.partition("?")
+        query_url = head
+        offset += 50
+
+def trackSearch(id):
+    url = "https://api.spotify.com/v1/tracks/"
+    query_url = url + id
+    # print(query_url)
+    header = getAuthHeader(token)
+    result = requests.get(query_url, headers=header)
+    json_result = json.loads(result.content)
+    name = json_result['name']
+    artist = json_result['artists'][0]['name']
+    search = name + " by " + artist
+    return search
+
+def main(link):
+    token = getSpotifyToken()
+    playlist_link = link
+    getTrackIDS(token, playlist_link)
+    print(track_id_list)
+    videoidlist = []
+    for songID in track_id_list:
+        search = trackSearch(songID)
+        videoID = getYT(search)
+        if videoID != "null":
+            videoidlist.append(videoID)
+            print("https://www.youtube.com/watch?v="+ videoID)
+        # downloadVid(videoID)
+    print("These are all the songs from the Playlist")
+    print(videoidlist)
+    
+    
+    # filesToMp3()
+    # print(track_id_list)
+    # print(videoidlist)
+    # print("These songs couldn't be downloaded")
+
+    print(not_found)
+    return 0
+
+def spotifyOnly():
+    link = playlist_link
+    token = getSpotifyToken()
+    getTrackIDS(token, link)
+
+    videoidlist = [trackSearch(song_id) for song_id in track_id_list]
+    print(videoidlist)
+    print(videoidlist)
+    return videoidlist
+
+# spotifyOnly()
+
+main(playlist_link)

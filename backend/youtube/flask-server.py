@@ -1,67 +1,93 @@
+# -*- coding: utf-8 -*-
+
+# from spotifyScraper import spotifyOnly
+
 import os
+from time import sleep
+
 import flask
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
+
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-from spotify import get_spotify_playlist_songs  # Import from your Spotify file
-from youtube import youtube_search, create_youtube_playlist, add_to_youtube_playlist  # Import from your YouTube file
 
-# Load environment variables from .env
-load_dotenv()
+from urllib.parse import urlparse, parse_qs
 
-# Spotify credentials
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-SPOTIFY_REDIRECT_URI = "http://127.0.0.1:5000/callback"
+from YTMutator import YouTubeMutator
 
-# YouTube credentials
+# The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
+# the OAuth 2.0 information for this application, including its client_id and
+# client_secret.
 CLIENT_SECRETS_FILE = "client_secrets_youtube_playlist_exporter.json"
+
+# This OAuth 2.0 access scope allows for full read/write access to the
+# authenticated user's account and requires requests to use an SSL connection.
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
-# Initialize Flask app
 app = flask.Flask(__name__)
+# Note: A secret key is included in the sample so that it works, but if you
+# use this code in your application please replace this with a truly secret
+# key. See http://flask.pocoo.org/docs/0.12/quickstart/#sessions.
 app.secret_key = os.urandom(12)
 
-# Spotify login function
-def spotify_login():
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-        client_id=SPOTIFY_CLIENT_ID,
-        client_secret=SPOTIFY_CLIENT_SECRET,
-        redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope="user-library-read"
-    ))
-    return sp
+youtube_manager = None
 
 @app.route('/')
 def index():
-    """Shows the main index page"""
-    return flask.render_template('index.html')
+    if 'credentials' not in flask.session:
+        return flask.redirect('authorize')
+
+# Load the credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(
+        **flask.session['credentials'])
+
+    youtube_instance = googleapiclient.discovery.build(
+        API_SERVICE_NAME, API_VERSION, credentials=credentials)
+
+    global youtube_manager
+    youtube_manager = YouTubeMutator(youtube_instance)
+
+    return channels_list_by_username(youtube_instance,
+        part='snippet,contentDetails,statistics',
+        forUsername='GoogleDevelopers')
+
 
 @app.route('/authorize')
 def authorize():
-    """Initiates the Spotify OAuth2 authorization flow"""
+    # Create a flow instance to manage the OAuth 2.0 Authorization Grant Flow
+    # # steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
     authorization_url, state = flow.authorization_url(
-        access_type='offline', include_granted_scopes='true')
+        # This parameter enables offline access which gives your application
+        # both an access and refresh token.
+        access_type='offline',
+        # This parameter enables incremental auth.
+        include_granted_scopes='true')  
+    # Store the state in the session so that the callback can verify that
+    # the authorization server response.
     flask.session['state'] = state
     return flask.redirect(authorization_url)
 
+
 @app.route('/oauth2callback')
 def oauth2callback():
-    """Handles the OAuth2 callback and stores credentials"""
+    # Specify the state when creating the flow in the callback so that it can
+    # verify the authorization server response.
     state = flask.session['state']
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True) 
+    # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = flask.request.url
-    flow.fetch_token(authorization_response=authorization_response)
+    flow.fetch_token(authorization_response=authorization_response) 
+    # Store the credentials in the session.
+    # ACTION ITEM for developers:
+    #     Store user's access and refresh tokens in your data store if
+    #     incorporating this code into your real app.
     credentials = flow.credentials
     flask.session['credentials'] = {
         'token': credentials.token,
@@ -71,48 +97,42 @@ def oauth2callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
+
     return flask.redirect('/PlaylistExporter')
 
 @app.route('/PlaylistExporter')
-def playlist_exporter():
-    """Export a Spotify playlist to YouTube"""
-    # Example playlist name
-    spotify_playlist_name = "Your Spotify Playlist Name"
-    youtube_playlist_name = "Your YouTube Playlist Name"
+def playlistExporter():
+    # call playlist scraper spotify only function
     
-    # Get Spotify songs
-    spotify_songs = get_spotify_playlist_songs(spotify_playlist_name)
+    # Load the credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(
+        **flask.session['credentials'])
 
-    # Create YouTube playlist
-    youtube_playlist_id = create_youtube_playlist(youtube_playlist_name)
+    youtube_instance = googleapiclient.discovery.build(
+        API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    # Add each Spotify song to YouTube playlist
-    for song in spotify_songs:
-        query = f"{song.song_name} by {song.artist_name}"
-        video_id = youtube_search(query)
+    global youtube_manager
+    if not youtube_manager:
+        youtube_manager = YouTubeMutator(youtube_instance)
 
-        if video_id:
-            add_to_youtube_playlist(youtube_playlist_id, video_id)
-            print(f"Added {query} to YouTube playlist.")
-        else:
-            print(f"Could not find {query} on YouTube.")
+    created_playlist = youtube_manager.createUserPlaylist(playlist_name='TESTING_API')
 
-    return flask.render_template('playlist_exported.html')
+    #youtube_manager.addSongToUserPlaylist(
+       # playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),
+       # url='https://www.youtube.com/watch?v=-OkrC6h2H5k'
+   # )
 
-@app.route('/list_youtube_playlists')
-def list_youtube_playlists():
-    """List YouTube playlists"""
-    credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
-    youtube = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
-    request = youtube.playlists().list(
-        part="snippet",
-        mine=True
-    )
-    response = request.execute()
-    playlists = response.get('items', [])
-    return flask.jsonify(playlists)
+    #view = youtube_manager.getUserPlaylist('TESTING_API')
+   # youtube_manager.updateUserPlaylistInfo(playlist_object=view)
+
+    return '<p>Lorem Ipsum</p>'
+
+def channels_list_by_username(client, **kwargs):
+    response = client.channels().list(**kwargs).execute()
+    return flask.jsonify(**response)
 
 if __name__ == '__main__':
-    # When running locally, disable OAuthlib's HTTPS verification
+    # When running locally, disable OAuthlib's HTTPs verification. When
+    # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run('localhost', 5000, debug=True)
+    app.run('localhost', 8090, debug=True)
