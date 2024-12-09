@@ -1,6 +1,5 @@
 import requests
 from dotenv import load_dotenv
-import sys
 import os
 import spotify
 
@@ -14,7 +13,7 @@ not_found = []
 load_dotenv()
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-googleSecret = os.getenv('googleKey')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
 
 # Youtube Data API 3 key 
@@ -72,9 +71,9 @@ def get_yt_links(search_object, google_api_key):
     }
 
 
-spotifySongs = spotify.send_user_playlist("si playlist")
+spotifySongs = spotify.send_user_playlist("test")
 
-youtubeLinks = get_yt_links(spotifySongs, googleSecret)
+youtubeLinks = get_yt_links(spotifySongs, GOOGLE_API_KEY)
 
 print(youtubeLinks)
 
