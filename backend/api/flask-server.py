@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# from spotifyScraper import spotifyOnly
-
 import os
 from time import sleep
 
