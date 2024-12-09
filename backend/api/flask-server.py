@@ -11,6 +11,7 @@ from urllib.parse import urlparse, parse_qs
 
 from YTMutator import YouTubeMutator
 
+import scraper
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
@@ -112,6 +113,7 @@ def playlistExporter():
         youtube_manager = YouTubeMutator(youtube_instance)
 
     created_playlist = youtube_manager.createUserPlaylist(playlist_name='TESTING_API')
+    youtube_manager.exportLinks(playlist_object=created_playlist, links=scraper.youtubeLinks)
 
     #youtube_manager.addSongToUserPlaylist(
        # playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),

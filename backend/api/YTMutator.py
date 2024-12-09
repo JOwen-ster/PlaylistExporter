@@ -48,8 +48,9 @@ class YouTubeMutator():
         }
         self.youtube_account.playlistItems().insert(part=part, body=insert_data).execute()
 
-    def exportLinks(self, playlist_object: object, links: list):
-        for link in links:
+    def exportLinks(self, playlist_object: object, links: dict):
+        iterableLinks = links['youtube_links']
+        for link in iterableLinks:
             self.addSongToUserPlaylist(playlist_object, link)
 
     def getSongObject(self, url):
