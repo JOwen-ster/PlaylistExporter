@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
 
   let output = "Nothing";
   let spotifyPlaylistLink = ""; // Bind to the input field
@@ -23,20 +22,6 @@
   } catch (error) {
     output = `Fetch failed: ${error.message}`;
   }
-  }
-
-  async function youtubeAuth() {
-    try {
-      const response = await fetch(`http://localhost:8090/authorize`);
-      if (response.ok) {
-        const data = await response.json();
-        output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
-      } else {
-        output = `Error: ${response.status} ${response.statusText}`;
-      }
-    } catch (error) {
-      output = `Fetch failed: ${error.message}`;
-    }
   }
 
   async function submitSpotifyPlaylist() {

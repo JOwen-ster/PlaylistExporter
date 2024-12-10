@@ -134,7 +134,8 @@ def playlistExporter():
         "playlist": created_playlist,
     }
     # Need to return back to website 
-    return jsonify(response_data) 
+    # return jsonify(response_data) 
+    return flask.redirect("http://localhost:5173")
     
 
 def channels_list_by_username(client, **kwargs):
