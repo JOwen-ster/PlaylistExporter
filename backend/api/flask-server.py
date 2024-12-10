@@ -161,16 +161,13 @@ def fetch_spotify_playlist():
 @app.route("/spotifyPlaylist", methods=['POST'])
 def spotify_playlist():
     data = request.get_json()
-    playlist_url = data.get('playlistUrl')
-
-    if not playlist_url:
-        return jsonify({"error": "No playlist URL provided"}), 400
+    playlist = data.get('selected')
 
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.
     response = {
-        "message": f"Playlist URL {playlist_url} received and processed.",
-        "playlistUrl": playlist_url,
+        "message": f" Playlist {playlist} received and processed.",
+        "playlist": playlist,
     }
 
     # Return a response

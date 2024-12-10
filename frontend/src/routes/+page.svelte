@@ -64,8 +64,24 @@
 
   // @ts-ignore
   async function handlePlaylistClick(playlist) {
-    output = `You clicked on: ${playlist}`;
-    // Additional logic for the clicked playlist can go here
+    try {
+      const response = await fetch('http://localhost:8090/spotifyPlaylist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ selected: playlist }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        output = `Playlist processed: ${JSON.stringify(data, null, 2)}`;
+      } else {
+        output = `Error: ${response.status} ${response.statusText}`;
+      }
+    } catch (error) {
+      output = `Fetch failed: ${error.message}`;
+    }
   }
 
 </script>
