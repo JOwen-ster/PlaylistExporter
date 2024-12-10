@@ -16,19 +16,27 @@
     }
   }
 
-  function fetch2() {
-    fetch('/TestingSpotify').then(response => response.json()).then(data => {
-            // Do something with the data here
-            console.log(data); 
-            output = data;
-             // For example, log the data to the console
-            // You can also update the state (like a variable) in your app
-        });
+  async function youtubeAuth2() {
+    try {
+    window.location.href = 'http://localhost:8090/authorize'; // Redirect the user to the /authorize route
+  } catch (error) {
+    output = `Fetch failed: ${error.message}`;
+  }
   }
 
-
-  onMount(fetchPlaylist);
-  onMount(fetch2);
+  async function youtubeAuth() {
+    try {
+      const response = await fetch(`http://localhost:8090/authorize`);
+      if (response.ok) {
+        const data = await response.json();
+        output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
+      } else {
+        output = `Error: ${response.status} ${response.statusText}`;
+      }
+    } catch (error) {
+      output = `Fetch failed: ${error.message}`;
+    }
+  }
 
 </script>
 
@@ -52,11 +60,17 @@
          class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">
         Login with Youtube
       </a>
+      <button  
+         class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
+         on:click={youtubeAuth2}>
+        Login with Youtube2:Auth
+      </button>
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
       on:click={fetchPlaylist}>
         Testing
       </button>
       <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">{output}</p>
+    
     </div>
   </div>
 

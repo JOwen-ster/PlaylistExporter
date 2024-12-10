@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import flask
-from flask import jsonify
+from flask import jsonify 
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -36,9 +36,9 @@ app.secret_key = os.urandom(12)
 
 youtube_manager = None
 
-CORS(app)  # Need to add this and CORS import to run flask server along with sveltekit 
+CORS(app, supports_credentials=True)  # Need to add this and CORS import to run flask server along with sveltekit 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     if 'credentials' not in flask.session:
         return flask.redirect('authorize')
@@ -133,12 +133,13 @@ def playlistExporter():
         "message": "Playlist created and updated successfully",
         "playlist": created_playlist,
     }
+    # Need to return back to website 
+    return jsonify(response_data) 
+    
 
-    return jsonify(response_data)
-
-# def channels_list_by_username(client, **kwargs):
-#     response = client.channels().list(**kwargs).execute()
-#     return flask.jsonify(**response)
+def channels_list_by_username(client, **kwargs):
+    response = client.channels().list(**kwargs).execute()
+    return flask.jsonify(**response)
 
 @app.route("/TestingSpotify", methods=['GET'])
 def fetch_spotify_playlist():
@@ -147,8 +148,6 @@ def fetch_spotify_playlist():
         return jsonify({"message": "YAYAYAY"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
