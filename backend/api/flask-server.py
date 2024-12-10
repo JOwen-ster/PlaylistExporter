@@ -8,11 +8,15 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
+from flask_cors import CORS
+
 from urllib.parse import urlparse, parse_qs
 
 from YTMutator import YouTubeMutator
 
-import scraper
+
+
+# import scraper
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
@@ -31,6 +35,8 @@ app = flask.Flask(__name__)
 app.secret_key = os.urandom(12)
 
 youtube_manager = None
+
+CORS(app)  # Need to add this and CORS import to run flask server along with sveltekit 
 
 @app.route('/')
 def index():
@@ -130,12 +136,22 @@ def playlistExporter():
 
     return jsonify(response_data)
 
-def channels_list_by_username(client, **kwargs):
-    response = client.channels().list(**kwargs).execute()
-    return flask.jsonify(**response)
+# def channels_list_by_username(client, **kwargs):
+#     response = client.channels().list(**kwargs).execute()
+#     return flask.jsonify(**response)
+
+@app.route("/TestingSpotify", methods=['GET'])
+def fetch_spotify_playlist():
+    try:
+        # Example logic
+        return jsonify({"message": "YAYAYAY"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
     # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run('localhost', 8090, debug=True)
+    app.run('localhost', port=8090, debug=True)

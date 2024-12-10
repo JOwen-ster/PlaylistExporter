@@ -1,30 +1,37 @@
 <script>
   import { onMount } from 'svelte';
 
-  let message = '';
-  let playlist;
-
-  const BACKEND_URL = 'http://localhost:8090';
-
+  let output = "Nothing";
   async function fetchPlaylist() {
-      try {
-          const response = await fetch(`${BACKEND_URL}/PlaylistExporter`, {
-              method: 'GET'
-          });
-          if (response.ok) {
-              const data = await response.json();
-              message = data.message;
-              playlist = data.playlist;
-          } else {
-              console.error('Error:', response.statusText);
-          }
-      } catch (error) {
-          console.error('Error:', error);
+    try {
+      const response = await fetch(`http://localhost:8090/TestingSpotify`, { method: 'GET' });
+      if (response.ok) {
+        const data = await response.json();
+        output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
+      } else {
+        output = `Error: ${response.status} ${response.statusText}`;
       }
+    } catch (error) {
+      output = `Fetch failed: ${error.message}`;
+    }
   }
 
-  onMount(fetchPlaylist); // Ensure to call fetchPlaylist once the component is mounted
+  function fetch2() {
+    fetch('/TestingSpotify').then(response => response.json()).then(data => {
+            // Do something with the data here
+            console.log(data); 
+            output = data;
+             // For example, log the data to the console
+            // You can also update the state (like a variable) in your app
+        });
+  }
+
+
+  onMount(fetchPlaylist);
+  onMount(fetch2);
+
 </script>
+
 
 <main class="flex flex-col justify-between h-screen">
 
@@ -37,13 +44,19 @@
     </p>
     <div class="flex flex-col items-center space-y-4">
       <a href="/auth/spotify" 
-         class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 m-5 rounded hover:bg-green-600">
+         class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 m-5 rounded hover:bg-green-600"
+         >
         Login with Spotify
       </a>
       <a href="/auth/youtube" 
          class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">
         Login with Youtube
       </a>
+      <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
+      on:click={fetchPlaylist}>
+        Testing
+      </button>
+      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">{output}</p>
     </div>
   </div>
 
