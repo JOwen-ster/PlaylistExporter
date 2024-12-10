@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
 
   let output = "Nothing";
+  let spotifyPlaylistLink = ""; // Bind to the input field
   async function fetchPlaylist() {
     try {
       const response = await fetch(`http://localhost:8090/TestingSpotify`, { method: 'GET' });
@@ -30,6 +31,32 @@
       if (response.ok) {
         const data = await response.json();
         output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
+      } else {
+        output = `Error: ${response.status} ${response.statusText}`;
+      }
+    } catch (error) {
+      output = `Fetch failed: ${error.message}`;
+    }
+  }
+
+  async function submitSpotifyPlaylist() {
+    if (!spotifyPlaylistLink) {
+      output = "Please enter a valid Spotify playlist URL.";
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8090/spotifyPlaylist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playlistUrl: spotifyPlaylistLink }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        output = `Playlist processed: ${JSON.stringify(data, null, 2)}`;
       } else {
         output = `Error: ${response.status} ${response.statusText}`;
       }
@@ -70,7 +97,21 @@
         Testing
       </button>
       <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">{output}</p>
-    
+      <!-- Form to accept Spotify Playlist URL -->
+      <div class="space-y-4">
+        <input
+          type="text"
+          placeholder="Enter Spotify Playlist URL"
+          bind:value={spotifyPlaylistLink}
+          class="px-4 py-2 rounded text-lg"
+        />
+        <button
+          on:click={submitSpotifyPlaylist}
+          class="md:text-2xl text-center text-white bg-blue-500 py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Submit Playlist URL
+        </button>
+      </div>
     </div>
   </div>
 

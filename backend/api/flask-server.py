@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import flask
-from flask import jsonify 
+from flask import jsonify , request
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -148,6 +148,24 @@ def fetch_spotify_playlist():
         return jsonify({"message": "YAYAYAY"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/spotifyPlaylist", methods=['POST'])
+def spotify_playlist():
+    data = request.get_json()
+    playlist_url = data.get('playlistUrl')
+
+    if not playlist_url:
+        return jsonify({"error": "No playlist URL provided"}), 400
+
+    # Process the playlist URL (you can add your logic here)
+    # Example: Extract playlist ID, fetch tracks, etc.
+    response = {
+        "message": f"Playlist URL {playlist_url} received and processed.",
+        "playlistUrl": playlist_url,
+    }
+
+    # Return a response
+    return jsonify(response)
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
