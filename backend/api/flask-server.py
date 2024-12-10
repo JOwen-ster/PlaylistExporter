@@ -36,6 +36,7 @@ app.secret_key = os.urandom(12)
 
 youtube_manager = None
 
+global playlistsSpotify
 playlistsSpotify = ["happy", "zcool playlist", "bears", "Wizard of oz"]
 
 CORS(app, supports_credentials=True)  # Need to add this and CORS import to run flask server along with sveltekit 
@@ -146,11 +147,10 @@ def channels_list_by_username(client, **kwargs):
 
 @app.route("/spotifyLogin")
 def loginSpotify():
-    global playlistsSpotify 
-    playlistsSpotify = spotify.login_user()
+    # playlistsSpotify = spotify.login_user()
     return flask.redirect("http://localhost:5173/")
 
-@app.route("/TestingSpotify", methods=['GET'])
+@app.route("/getPlaylists", methods=['GET'])
 def fetch_spotify_playlist():
     try:
         # Example logic

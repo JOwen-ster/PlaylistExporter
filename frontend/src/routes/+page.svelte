@@ -3,12 +3,14 @@
   let output = "Nothing";
   let spotifyResponse = "Login with Spotify";
   let spotifyPlaylistLink = ""; // Bind to the input field
+  let playlists = [];
   async function fetchPlaylist() {
     try {
-      const response = await fetch(`http://localhost:8090/TestingSpotify`, { method: 'GET' });
+      const response = await fetch(`http://localhost:8090/getPlaylists`, { method: 'GET' });
       if (response.ok) {
         const data = await response.json();
         output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
+        playlists = data.playlists;
       } else {
         output = `Error: ${response.status} ${response.statusText}`;
       }
@@ -60,6 +62,12 @@
     }
   }
 
+  // @ts-ignore
+  async function handlePlaylistClick(playlist) {
+    output = `You clicked on: ${playlist}`;
+    // Additional logic for the clicked playlist can go here
+  }
+
 </script>
 
 
@@ -103,6 +111,22 @@
           Submit Playlist URL
         </button>
       </div>
+    </div>
+    <!-- Display Playlists -->
+    <div class="space-y-4 w-full text-center">
+      {#if playlists.length > 0}
+        <ul class="space-y-2">
+          {#each playlists as playlist}
+            <li 
+              class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+              on:click={() => handlePlaylistClick(playlist)}>
+              {playlist}
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
+      {/if}
     </div>
   </div>
 
