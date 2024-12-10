@@ -4,6 +4,7 @@
   let spotifyResponse = "Login with Spotify";
   let spotifyPlaylistLink = ""; // Bind to the input field
   let playlists = [];
+  let playlistSelected = "None";
   async function fetchPlaylist() {
     try {
       const response = await fetch(`http://localhost:8090/getPlaylists`, { method: 'GET' });
@@ -61,21 +62,25 @@
       output = `Fetch failed: ${error.message}`;
     }
   }
+  function handlePlaylistClick(playlist) {
+    playlistSelected = playlist;
+  }
 
   // @ts-ignore
-  async function handlePlaylistClick(playlist) {
+  async function submitPlaylist(playlistSelected) {
     try {
       const response = await fetch('http://localhost:8090/spotifyPlaylist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ selected: playlist }),
+        body: JSON.stringify({ selected: playlistSelected }),
       });
 
       if (response.ok) {
         const data = await response.json();
         output = `Playlist processed: ${JSON.stringify(data, null, 2)}`;
+        output = data.message;
       } else {
         output = `Error: ${response.status} ${response.statusText}`;
       }
@@ -109,9 +114,10 @@
       </button>
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
       on:click={fetchPlaylist}>
-        Testing
+        Get Playlists
       </button>
-      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">{output}</p>
+      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Playlist Selected: {playlistSelected}</p>
+      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
       <!-- Form to accept Spotify Playlist URL -->
       <div class="space-y-4">
         <input
@@ -144,6 +150,13 @@
         <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
       {/if}
     </div>
+    <button
+          on:click={() => submitPlaylist(playlistSelected)}
+          class="md:text-2xl text-center text-white bg-blue-500 py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Submit Playlist
+        </button>
+    <div> 
   </div>
 
   <div class="text-center">
