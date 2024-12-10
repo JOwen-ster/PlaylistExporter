@@ -147,7 +147,8 @@ def channels_list_by_username(client, **kwargs):
 
 @app.route("/spotifyLogin")
 def loginSpotify():
-    # playlistsSpotify = spotify.login_user()
+    global playlistsSpotify
+    playlistsSpotify = spotify.login_user()
     return flask.redirect("http://localhost:5173/")
 
 @app.route("/getPlaylists", methods=['GET'])
@@ -158,10 +159,12 @@ def fetch_spotify_playlist():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route("/spotifyPlaylist", methods=['POST'])
+@app.route("/getSongs", methods=['POST'])
 def spotify_playlist():
     data = request.get_json()
     playlist = data.get('selected')
+
+    spotify.send_user_playlist(playlist_name=playlist)
 
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.

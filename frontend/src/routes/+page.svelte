@@ -31,10 +31,10 @@
   async function spotifyAuth() {
     try {
     window.location.href = 'http://localhost:8090/spotifyLogin'; // Redirect the user to the /authorize route
-    spotifyResponse = "Logged In";
   } catch (error) {
     output = `Fetch failed: ${error.message}`;
   }
+  spotifyResponse = "Logged In";
   }
 
   async function submitSpotifyPlaylist() {
@@ -69,7 +69,7 @@
   // @ts-ignore
   async function submitPlaylist(playlistSelected) {
     try {
-      const response = await fetch('http://localhost:8090/spotifyPlaylist', {
+      const response = await fetch('http://localhost:8090/getSongs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
