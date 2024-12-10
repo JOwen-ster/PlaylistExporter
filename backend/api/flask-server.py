@@ -172,6 +172,7 @@ def spotify_playlist():
     response = {
         "message": f" Playlist {playlist} received and processed.",
         "playlist": playlist,
+        "songs": songsForYoutube,
     }
 
     # Return a response
