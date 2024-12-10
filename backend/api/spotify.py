@@ -38,8 +38,8 @@ def login_user():
     global user_playlists
     user_playlists = {playlist["name"]: playlist["href"]
                     for playlist in sp.current_user_playlists()["items"]}
-    return sp
-
+    return user_playlists.keys()
+    
 
 def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
     """Returns a list of SpotifySong objects containing song and artist names from the specified playlist."""
@@ -68,3 +68,6 @@ def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
         all_user_songs.append(SpotifySong(artist_name=artist_name, song_name=song_name))
 
     return all_user_songs
+
+
+print(login_user())
