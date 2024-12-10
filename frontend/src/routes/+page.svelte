@@ -1,5 +1,29 @@
 <script>
+  import { onMount } from 'svelte';
 
+  let message = '';
+  let playlist;
+
+  const BACKEND_URL = 'http://localhost:8090';
+
+  async function fetchPlaylist() {
+      try {
+          const response = await fetch(`${BACKEND_URL}/PlaylistExporter`, {
+              method: 'GET'
+          });
+          if (response.ok) {
+              const data = await response.json();
+              message = data.message;
+              playlist = data.playlist;
+          } else {
+              console.error('Error:', response.statusText);
+          }
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  }
+
+  onMount(fetchPlaylist); // Ensure to call fetchPlaylist once the component is mounted
 </script>
 
 <main class="flex flex-col justify-between h-screen">

@@ -2,6 +2,7 @@ import os
 from time import sleep
 
 import flask
+from flask import jsonify
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -97,33 +98,37 @@ def oauth2callback():
 
     return flask.redirect('/PlaylistExporter')
 
-@app.route('/PlaylistExporter')
+@app.route("/PlaylistExporter")
 def playlistExporter():
     # call playlist scraper spotify only function
-    
+
     # Load the credentials from the session.
-    credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
+    credentials = google.oauth2.credentials.Credentials(**flask.session["credentials"])
 
     youtube_instance = googleapiclient.discovery.build(
-        API_SERVICE_NAME, API_VERSION, credentials=credentials)
+        API_SERVICE_NAME, API_VERSION, credentials=credentials
+    )
 
     global youtube_manager
     if not youtube_manager:
         youtube_manager = YouTubeMutator(youtube_instance)
 
-    created_playlist = youtube_manager.createUserPlaylist(playlist_name='TESTING_API')
-    youtube_manager.exportLinks(playlist_object=created_playlist, links=scraper.youtubeLinks)
+    created_playlist = youtube_manager.createUserPlaylist(playlist_name="TESTING_API")
 
-    #youtube_manager.addSongToUserPlaylist(
-       # playlist_object=youtube_manager.getUserPlaylist('TESTING_API'),
-       # url='https://www.youtube.com/watch?v=-OkrC6h2H5k'
-   # )
+    youtube_manager.addSongToUserPlaylist(
+        playlist_object=youtube_manager.getUserPlaylist("TESTING_API"),
+        url="https://www.youtube.com/watch?v=-OkrC6h2H5k",
+    )
 
-    #view = youtube_manager.getUserPlaylist('TESTING_API')
-   # youtube_manager.updateUserPlaylistInfo(playlist_object=view)
+    view = youtube_manager.getUserPlaylist("TESTING_API")
+    youtube_manager.updateUserPlaylistInfo(playlist_object=view)
 
-    return '<p>Lorem Ipsum</p>'
+    response_data = {
+        "message": "Playlist created and updated successfully",
+        "playlist": created_playlist,
+    }
+
+    return jsonify(response_data)
 
 def channels_list_by_username(client, **kwargs):
     response = client.channels().list(**kwargs).execute()
