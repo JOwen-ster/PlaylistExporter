@@ -1,6 +1,7 @@
 <script>
 
   let output = "Nothing";
+  let spotifyResponse = "Login with Spotify";
   let spotifyPlaylistLink = ""; // Bind to the input field
   async function fetchPlaylist() {
     try {
@@ -16,9 +17,18 @@
     }
   }
 
-  async function youtubeAuth2() {
+  async function youtubeAuth() {
     try {
     window.location.href = 'http://localhost:8090/authorize'; // Redirect the user to the /authorize route
+  } catch (error) {
+    output = `Fetch failed: ${error.message}`;
+  }
+  }
+
+  async function spotifyAuth() {
+    try {
+    window.location.href = 'http://localhost:8090/spotifyLogin'; // Redirect the user to the /authorize route
+    spotifyResponse = "Logged In";
   } catch (error) {
     output = `Fetch failed: ${error.message}`;
   }
@@ -63,19 +73,15 @@
       Start Converting Your Playlists from Spotify to YouTube
     </p>
     <div class="flex flex-col items-center space-y-4">
-      <a href="/auth/spotify" 
+      <button  
          class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 m-5 rounded hover:bg-green-600"
-         >
-        Login with Spotify
-      </a>
-      <a href="/auth/youtube" 
-         class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">
-        Login with Youtube
-      </a>
+         on:click={spotifyAuth}>
+        {spotifyResponse}
+      </button>
       <button  
          class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
-         on:click={youtubeAuth2}>
-        Login with Youtube2:Auth
+         on:click={youtubeAuth}>
+        Login with Youtube
       </button>
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
       on:click={fetchPlaylist}>

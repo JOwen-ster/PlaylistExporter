@@ -14,7 +14,7 @@ from urllib.parse import urlparse, parse_qs
 
 from YTMutator import YouTubeMutator
 
-
+import spotify 
 
 # import scraper
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
@@ -135,12 +135,17 @@ def playlistExporter():
     }
     # Need to return back to website 
     # return jsonify(response_data) 
-    return flask.redirect("http://localhost:5173")
+    return flask.redirect("http://localhost:5173/success")
     
 
 def channels_list_by_username(client, **kwargs):
     response = client.channels().list(**kwargs).execute()
     return flask.jsonify(**response)
+
+@app.route("/spotifyLogin")
+def loginSpotify():
+    spotify.login_user()
+    return flask.redirect("http://localhost:5173/")
 
 @app.route("/TestingSpotify", methods=['GET'])
 def fetch_spotify_playlist():
