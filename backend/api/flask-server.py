@@ -38,6 +38,7 @@ youtube_manager = None
 
 global playlistsSpotify
 playlistsSpotify = ["happy", "zcool playlist", "bears", "Wizard of oz"]
+songsForYoutube = []
 
 CORS(app, supports_credentials=True)  # Need to add this and CORS import to run flask server along with sveltekit 
 
@@ -163,8 +164,8 @@ def fetch_spotify_playlist():
 def spotify_playlist():
     data = request.get_json()
     playlist = data.get('selected')
-
-    spotify.send_user_playlist(playlist_name=playlist)
+    global songsForYoutube
+    songsForYoutube = spotify.send_user_playlist(playlist_name=playlist)
 
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.

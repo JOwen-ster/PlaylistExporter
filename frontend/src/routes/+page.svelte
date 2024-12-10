@@ -80,7 +80,7 @@
       if (response.ok) {
         const data = await response.json();
         output = `Playlist processed: ${JSON.stringify(data, null, 2)}`;
-        output = data.message;
+        output = data.songs;
       } else {
         output = `Error: ${response.status} ${response.statusText}`;
       }
