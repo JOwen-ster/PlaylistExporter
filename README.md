@@ -26,8 +26,8 @@ The app is designed to make the playlist conversion process as straightforward a
 3. **Playlist Conversion**  
    After selecting a Spotify playlist, the app extracts the names and artists of the songs within it. It then searches YouTube for the corresponding videos. When a match is found, the app compiles these videos into a new playlist on the user’s YouTube account.
 
-4. **Limitations**  
-   To ensure smooth operation and compliance with API constraints, there is a cap on the number of songs that can be converted in a single session. This ensures that the app remains efficient even for larger playlists.
+4. **Limitations**
+   Each user must choose a Spotify playlist with no more than 50 songs due to Youtube's API rate limit when creating and inserting to playlists.
 
 ---
 
