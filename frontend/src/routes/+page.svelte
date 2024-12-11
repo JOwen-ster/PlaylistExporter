@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 
   let output = "Nothing";
   let spotifyResponse = "Login with Spotify";
@@ -63,12 +63,14 @@
       output = `Fetch failed: ${error.message}`;
     }
   }
+
   function handlePlaylistClick(playlist) {
     playlistSelected = playlist;
+    console.log(playlistSelected);
   }
 
-  // @ts-ignore
   async function submitPlaylist(playlistSelected) {
+    console.log(playlistSelected);
     try {
       const response = await fetch('http://localhost:8090/getSongs', {
         method: 'POST',
@@ -78,14 +80,16 @@
         body: JSON.stringify({ selected: playlistSelected }),
       });
 
+      console.log("response:", response);
+
       if (response.ok) {
-        const data = await response.json();
-        output = `Playlist processed: ${JSON.stringify(data, null, 2)}`;
-        output = data.songs;
+        console.log("before awaiting response works");
       } else {
+        console.log("doesnt work");
         output = `Error: ${response.status} ${response.statusText}`;
       }
     } catch (error) {
+      console.log("doesnt work pt2");
       output = `Fetch failed: ${error.message}`;
     }
   }
@@ -94,7 +98,6 @@
 
 
 <main class="flex flex-col justify-between h-screen">
-
   <div>
     <h1 class="text-center text-3xl md:text-6xl mt-8 text-[#1C873E] font-medium">
       Welcome to Playlist Exporter!
@@ -122,51 +125,34 @@
         Get Playlists
       </button>
       <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Playlist Selected: {playlistSelected}</p>
-      <!--
-        <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
-      -->
-      <!-- Form to accept Spotify Playlist URL 
-      <div class="space-y-4">
-        <input
-          type="text"
-          placeholder="Enter Spotify Playlist URL"
-          bind:value={spotifyPlaylistLink}
-          class="px-4 py-2 rounded text-lg"
-        />
-        <button
-          on:click={submitSpotifyPlaylist}
-          class="md:text-2xl text-center text-white bg-blue-500 py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Submit Playlist URL
-        </button>
-      </div>
-    </div>
-    -->
 
+        <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
 
     <!-- Display Playlists -->
-    <div class="space-y-4 w-full text-center">
-      {#if playlists.length > 0}
-        <select 
-          class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded w-48"
-          on:change={(event) => handlePlaylistClick(event.target.value)}
-        >
-          <option disabled selected>Select a playlist</option>
-          {#each playlists as playlist}
-            <option value={playlist}>{playlist}</option>
-          {/each}
-        </select>
-      {:else}
-        <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
-      {/if}
-    </div>
+  <div class="space-y-4 w-full text-center">
+    {#if playlists.length > 0}
+      <ul class="space-y-2">
+        {#each playlists as playlist}
+          <li 
+            class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+            on:click={() => handlePlaylistClick(playlist)}>
+            {playlist}
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
+    {/if}
+
+  </div>
     
     <button
-          on:click={() => submitPlaylist(playlistSelected)}
+          on:click={(event) => submitPlaylist(playlistSelected)}
           class="md:text-2xl text-center text-white bg-blue-500 py-2 px-4 rounded hover:bg-blue-600"
         >
           Submit Playlist
-        </button>
+      </button>
+
     <div> 
   </div>
 

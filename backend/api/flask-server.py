@@ -116,6 +116,10 @@ def oauth2callback():
 
 @app.route("/PlaylistExporter")
 def playlistExporter():
+    global songsForYoutube
+    songsForYoutube = spotify.send_user_playlist(playlist_name=playlistName)
+    global youtubeIds
+    youtubeIds = get_yt_links(songsForYoutube, GOOGLE_API_KEY)
     global credentials
     # call playlist scraper spotify only function
     if "credentials" not in flask.session:
@@ -133,20 +137,10 @@ def playlistExporter():
         youtube_manager = YouTubeMutator(youtube_instance)
 
     created_playlist = youtube_manager.createUserPlaylist(playlist_name=playlistName)
-    YouTubeMutator.exportLinks(created_playlist, youtubeIds) # error
-    
-    youtube_manager.addSongToUserPlaylist(
-        playlist_object=youtube_manager.getUserPlaylist(playlist_name=playlistName),
-        url="https://www.youtube.com/watch?v=-OkrC6h2H5k",
-    )
+    print("created_playlist: ", created_playlist)
+    print("youtubeIds: ", youtubeIds)
+    youtube_manager.exportLinks(created_playlist, youtubeIds) # error
 
-    view = youtube_manager.getUserPlaylist(playlistName)
-    youtube_manager.updateUserPlaylistInfo(playlist_object=view)
-
-    response_data = {
-        "message": "Playlist created and updated successfully",
-        "playlist": created_playlist,
-    }
     # Need to return back to website 
     # return jsonify(response_data) 
     return flask.redirect("http://localhost:5173/success")
@@ -177,13 +171,15 @@ def fetch_spotify_playlist():
 @app.route("/getSongs", methods=['POST'])
 def spotify_playlist():
     data = request.get_json()
+    print("data: ", data)
     playlist = data.get('selected')
+    print("playlist:", playlist)
     global playlistName
     playlistName = playlist
-    global songsForYoutube
-    songsForYoutube = spotify.send_user_playlist(playlist_name=playlist)
-    global youtubeIds
-    youtubeIds = get_yt_links(songsForYoutube, GOOGLE_API_KEY)
+    #global songsForYoutube
+    #songsForYoutube = spotify.send_user_playlist(playlist_name=playlist)
+    #global youtubeIds
+    #youtubeIds = get_yt_links(songsForYoutube, GOOGLE_API_KEY)
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.
     # response = {
@@ -193,7 +189,7 @@ def spotify_playlist():
     # }
 
     # Return a response
-    return flask.redirect("/PlaylistExporter")
+    return flask.redirect("http://localhost:5173/")
 
 
 if __name__ == '__main__':
