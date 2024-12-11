@@ -5,6 +5,7 @@
   let spotifyPlaylistLink = ""; // Bind to the input field
   let playlists = [];
   let playlistSelected = "None";
+  let spotifyLogin = false;
   async function fetchPlaylist() {
     try {
       const response = await fetch(`http://localhost:8090/getPlaylists`, { method: 'GET' });
@@ -36,6 +37,7 @@
     output = `Fetch failed: ${error.message}`;
   }
   spotifyResponse = "Logged In";
+  spotifyLogin = true;
   }
 
   async function submitSpotifyPlaylist() {
@@ -113,21 +115,19 @@
           on:click={spotifyAuth}>
           {spotifyResponse}
         </button>
+        {#if spotifyLogin}
         <button  
           class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
           on:click={youtubeAuth}>
           Login with Youtube
         </button>
+        {/if}
       </div>
 
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
       on:click={fetchPlaylist}>
         Get Playlists
       </button>
-      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Playlist Selected: {playlistSelected}</p>
-
-        <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
-
     <!-- Display Playlists -->
   <div class="space-y-4 w-full text-center">
     {#if playlists.length > 0}
