@@ -31,6 +31,76 @@ The app is designed to make the playlist conversion process as straightforward a
 
 ---
 
+## How to Run the Project
+
+1. **Set Up Environment Variables**  
+   - Obtain Spotify Developer credentials (Client ID and Client Secret) from the [Spotify Developer Portal](https://developer.spotify.com/dashboard/).  
+   - Generate a Google API Key from the [Google Cloud Console](https://console.cloud.google.com/).  
+   - Create a `.env` file in the root directory using the format in `env.example`:
+     ```env
+     clientID="🩷"
+     clientSecret="💜"
+     GOOGLE_API_KEY="💛"
+
+     SPOTIFY_CLIENT_ID="💚"
+     SPOTIFY_CLIENT_SECRET="🧡"
+     ```
+
+2. **Install Dependencies**  
+   - Ensure Python v3 is installed on your system.  
+   - Open a terminal, navigate to the `backend/api` folder by running:  
+     ```bash
+     cd backend/api
+     ```  
+   - Install the required Python dependencies by running:  
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Run the Application**  
+   Open **two terminals**:  
+
+   - **Terminal 1:**  
+     - From the root directory of the project, navigate to the `backend/api` folder:  
+       ```bash
+       cd backend/api
+       ```  
+     - Start the Flask server:  
+       - On Mac:  
+         ```bash
+         python3 flask-server.py
+         ```  
+       - On Windows:  
+         ```bash
+         python flask-server.py
+         ```
+
+   - **Terminal 2:**  
+     - From the root directory of the project, navigate to the `frontend` folder:  
+       ```bash
+       cd frontend
+       ```  
+     - Install the required Node.js dependencies by running:  
+       ```bash
+       npm install
+       ```  
+     - Start the Svelte development server:  
+       ```bash
+       npm run dev
+       ```
+
+4. **Use the Application**  
+   - Open a browser and navigate to the provided URL (usually `http://localhost:3000`).  
+   - Click **Login to Spotify** to authenticate.  
+   - Select a playlist and click **Submit Playlist**.  
+   - Click **Login to YouTube**, and you'll be redirected to a success page.  
+   - Check your YouTube account for the exported playlist.
+
+**Note:** Both terminals must remain running simultaneously for the application to work.
+
+
+---
+
 ## 🖼️ Screenshots
 <img width="1470" alt="Screenshot 2024-12-10 at 7 51 38 PM" src="https://github.com/user-attachments/assets/dd5f18dc-ade0-4e4d-9a6e-060a789d6a4c">
 <img width="1470" alt="Screenshot 2024-12-10 at 7 52 18 PM" src="https://github.com/user-attachments/assets/dcd8c846-91aa-4ed8-ad16-cd4d83150e5c">
@@ -38,23 +108,6 @@ The app is designed to make the playlist conversion process as straightforward a
 <img width="1470" alt="Screenshot 2024-12-10 at 7 53 01 PM" src="https://github.com/user-attachments/assets/d33a7cb6-1ff0-44ad-b619-642883d6963f">
 <img width="1470" alt="Screenshot 2024-12-10 at 7 53 55 PM" src="https://github.com/user-attachments/assets/e62cda6f-64c1-457e-a5d2-1b2f5ba07d07">
 <img width="974" alt="Screenshot 2024-12-10 at 7 54 37 PM" src="https://github.com/user-attachments/assets/9aeb9053-d2ee-433d-8ef4-dace9b95b20e">
-
-
-
----
-
-## How to Run the Project
-
-*(TBD)*
-
----
-
-## Key Features
-
-- **Easy Playlist Transfer:** Move your music effortlessly between Spotify and YouTube with minimal input.
-- **Accurate Song Matching:** Leverages song titles and artist names to find the closest matches on YouTube.
-- **Dynamic Playlist Creation:** Automatically generates and saves a YouTube playlist with the selected songs.
-- **Responsive Design:** Enjoy a user-friendly interface on both desktop and mobile devices.
 
 ---
 
