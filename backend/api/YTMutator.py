@@ -33,8 +33,7 @@ class YouTubeMutator():
         playlist_object = self.youtube_account.playlists().insert(part=part, body=resource).execute()
         return playlist_object
 
-    def addSongToUserPlaylist(self, playlist_object, url):
-        yt_song = self.getSongObject(url=url)
+    def addSongToUserPlaylist(self, playlist_object, videoId):
         part = 'id,snippet,status,contentDetails'
         insert_data = {
             'kind': 'youtube#playlistItem',
@@ -42,15 +41,14 @@ class YouTubeMutator():
                 'playlistId': playlist_object['id'],
                 'resourceId': {
                     'kind': 'youtube#video',
-                    'videoId': yt_song['items'][0]['id']
+                    'videoId': videoId
                 }
             }
         }
         self.youtube_account.playlistItems().insert(part=part, body=insert_data).execute()
 
-    def exportLinks(self, playlist_object: object, links: dict):
-        iterableLinks = links['youtube_links']
-        for link in iterableLinks:
+    def exportLinks(self, playlist_object: object, links: list):
+        for link in links:
             self.addSongToUserPlaylist(playlist_object, link)
 
     def getSongObject(self, url):

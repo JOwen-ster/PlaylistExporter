@@ -22,11 +22,13 @@ scope = "user-library-read"
 redirect_uri = "http://127.0.0.1:5000/"
 user = "spotify"
 user_playlists = {}
+sp = None
 
 
-def login_user():
-    """Logs in the user to Spotify."""
-    
+def login_user() -> List[str]:
+    """Logs in the user to Spotify and returns a list of playlist names."""
+    global sp, user_playlists
+
     sp = spotipy.Spotify(
         auth_manager=SpotifyOAuth(
             client_id=SPOTIFY_CLIENT_ID,
@@ -35,36 +37,40 @@ def login_user():
             scope=scope,
         )
     )
-    global user_playlists
-    user_playlists = {playlist["name"]: playlist["href"]
-                    for playlist in sp.current_user_playlists()["items"]}
-    return sp
+    
+    playlists = sp.current_user_playlists()["items"]
+    
+    # Populate the global dictionary with playlist names and URLs
+    user_playlists = {playlist["name"]: playlist["href"] for playlist in playlists}
+    
+    # Return just the playlist names
+    return list(user_playlists.keys())
 
+
+    
 
 def send_user_playlist(playlist_name: str) -> List[SpotifySong]:
     """Returns a list of SpotifySong objects containing song and artist names from the specified playlist."""
+    global sp, user_playlists
 
-    sp = login_user()
-    playlists = sp.current_user_playlists()
-    for playlist in playlists["items"]:
-        user_playlists[playlist["name"]] = playlist["href"]
-
-        
+    if not sp:
+        raise ValueError("User is not logged in. Please log in first by calling login_user.")
+    
     if playlist_name not in user_playlists:
-        raise ValueError("Playlist not found.")
+        raise ValueError(f"Playlist '{playlist_name}' not found. Please fetch playlists again.")
 
+    # Extract playlist URL and ID
     playlist_url = user_playlists[playlist_name]
     playlist_id = playlist_url.split("/")[-1]
-
+    
     results = sp.playlist_tracks(playlist_id)
     all_user_songs = []
-
-    for item in results.get("items"):
-
+    
+    for item in results.get("items", []):
         track = item["track"]
         artist_name = track["artists"][0]["name"]
         song_name = track["name"]
-
         all_user_songs.append(SpotifySong(artist_name=artist_name, song_name=song_name))
-
+    
     return all_user_songs
+
