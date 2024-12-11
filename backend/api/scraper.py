@@ -35,16 +35,14 @@ def get_yt_links(search_object, google_api_key):
             # Validate response structure
             if results.get("pageInfo", {}).get("totalResults", 0) > 0:
                 video_id = results["items"][0]["id"]["videoId"]
-                youtube_links.append(f"https://www.youtube.com/watch?v={video_id}")
+                youtube_links.append(video_id)
             else:
                 not_found.append(search_query)
         except requests.exceptions.RequestException as e:
             print(f"Error during YouTube search for '{search_query}': {e}")
             not_found.append(search_query)
     
-    return {
-        "youtube_links": youtube_links,
-    }
+    return youtube_links
 
 
 spotifySongs = spotify.send_user_playlist("test")

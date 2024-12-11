@@ -16,6 +16,8 @@ from YTMutator import YouTubeMutator
 
 import spotify 
 
+from scraper import get_yt_links, GOOGLE_API_KEY
+
 # import scraper
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -39,6 +41,8 @@ youtube_manager = None
 global playlistsSpotify
 playlistsSpotify = ["happy", "zcool playlist", "bears", "Wizard of oz"]
 songsForYoutube = []
+youtubeIds = []
+playlistName = ""
 
 CORS(app, supports_credentials=True)  # Need to add this and CORS import to run flask server along with sveltekit 
 
@@ -123,10 +127,11 @@ def playlistExporter():
     if not youtube_manager:
         youtube_manager = YouTubeMutator(youtube_instance)
 
-    created_playlist = youtube_manager.createUserPlaylist(playlist_name="TESTING_API")
-
+    created_playlist = youtube_manager.createUserPlaylist(playlist_name=playlistName)
+    YouTubeMutator.exportLinks(created_playlist, youtubeIds)
+    
     youtube_manager.addSongToUserPlaylist(
-        playlist_object=youtube_manager.getUserPlaylist("TESTING_API"),
+        playlist_object=youtube_manager.getUserPlaylist(playlist_name=playlistName),
         url="https://www.youtube.com/watch?v=-OkrC6h2H5k",
     )
 
@@ -168,9 +173,12 @@ def fetch_spotify_playlist():
 def spotify_playlist():
     data = request.get_json()
     playlist = data.get('selected')
+    global playlistName
+    playlistName = playlist
     global songsForYoutube
     songsForYoutube = spotify.send_user_playlist(playlist_name=playlist)
-
+    global youtubeIds
+    youtubeIds = get_yt_links(songsForYoutube, GOOGLE_API_KEY)
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.
     response = {
@@ -181,6 +189,7 @@ def spotify_playlist():
 
     # Return a response
     return jsonify(response)
+
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
