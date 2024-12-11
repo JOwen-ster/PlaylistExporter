@@ -32,8 +32,14 @@ The app is designed to make the playlist conversion process as straightforward a
 ---
 
 ## 🖼️ Screenshots
+<img width="1470" alt="Screenshot 2024-12-10 at 7 51 38 PM" src="https://github.com/user-attachments/assets/dd5f18dc-ade0-4e4d-9a6e-060a789d6a4c">
+<img width="1470" alt="Screenshot 2024-12-10 at 7 52 18 PM" src="https://github.com/user-attachments/assets/dcd8c846-91aa-4ed8-ad16-cd4d83150e5c">
+<img width="1470" alt="Screenshot 2024-12-10 at 7 52 38 PM" src="https://github.com/user-attachments/assets/c3323423-31c2-46c1-b89a-cbb19880e3d7">
+<img width="1470" alt="Screenshot 2024-12-10 at 7 53 01 PM" src="https://github.com/user-attachments/assets/d33a7cb6-1ff0-44ad-b619-642883d6963f">
+<img width="1470" alt="Screenshot 2024-12-10 at 7 53 55 PM" src="https://github.com/user-attachments/assets/e62cda6f-64c1-457e-a5d2-1b2f5ba07d07">
+<img width="974" alt="Screenshot 2024-12-10 at 7 54 37 PM" src="https://github.com/user-attachments/assets/9aeb9053-d2ee-433d-8ef4-dace9b95b20e">
 
-*(TBD)*
+
 
 ---
 
