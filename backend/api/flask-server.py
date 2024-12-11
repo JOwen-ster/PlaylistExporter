@@ -110,7 +110,7 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.redirect('/PlaylistExporter')
+    return flask.redirect("http://localhost:5173/")
 
 @app.route("/PlaylistExporter")
 def playlistExporter():
@@ -181,14 +181,14 @@ def spotify_playlist():
     youtubeIds = get_yt_links(songsForYoutube, GOOGLE_API_KEY)
     # Process the playlist URL (you can add your logic here)
     # Example: Extract playlist ID, fetch tracks, etc.
-    response = {
-        "message": f" Playlist {playlist} received and processed.",
-        "playlist": playlist,
-        "songs": songsForYoutube,
-    }
+    # response = {
+    #     "message": f" Playlist {playlist} received and processed.",
+    #     "playlist": playlist,
+    #     "songs": songsForYoutube,
+    # }
 
     # Return a response
-    return jsonify(response)
+    return flask.redirect("/PlaylistExporter")
 
 
 if __name__ == '__main__':
