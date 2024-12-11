@@ -45,8 +45,8 @@ def get_yt_links(search_object, google_api_key):
     return youtube_links
 
 
-spotifySongs = spotify.send_user_playlist("test")
+#spotifySongs = spotify.send_user_playlist("test")
 
-youtubeLinks = get_yt_links(spotifySongs, GOOGLE_API_KEY)
+#youtubeLinks = get_yt_links(spotifySongs, GOOGLE_API_KEY)
 
-print(youtubeLinks)
+#print(youtubeLinks)

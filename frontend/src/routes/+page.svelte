@@ -191,12 +191,4 @@
     background-color: black;
     font-family: "Alegreya Sans", sans-serif;
   }
-
-  a {
-    transition: all 0.3s;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
 </style>
