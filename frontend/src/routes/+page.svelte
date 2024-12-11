@@ -1,11 +1,9 @@
 <script lang="ts">
-
+  let spotifyLogin: string = "false";
+  let spotifyResponse: string = "Log In to Spotify";
   let output = "Nothing";
-  let spotifyResponse = "Login with Spotify";
-  let spotifyPlaylistLink = ""; // Bind to the input field
   let playlists = [];
   let playlistSelected = "None";
-  let spotifyLogin = false;
   async function fetchPlaylist() {
     try {
       const response = await fetch(`http://localhost:8090/getPlaylists`, { method: 'GET' });
@@ -36,8 +34,10 @@
   } catch (error) {
     output = `Fetch failed: ${error.message}`;
   }
-  spotifyResponse = "Logged In";
-  spotifyLogin = true;
+  }
+  function spotifyLog() {
+    spotifyResponse = "Logged In";
+    spotifyLogin = true;
   }
 
   async function submitSpotifyPlaylist() {
@@ -112,22 +112,24 @@
       <div class="flex flex-row gap-3">
         <button  
           class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 rounded hover:bg-green-600"
-          on:click={spotifyAuth}>
+          on:click={() => {spotifyAuth(), spotifyLog()}}>
           {spotifyResponse}
         </button>
-        {#if spotifyLogin}
+      </div>
+      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Selected Playlist: {playlistSelected}</p>
+      
+      <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
+      on:click={fetchPlaylist}>
+        Get Playlists
+      </button>
+      {#if spotifyLogin == "true"}
         <button  
           class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
           on:click={youtubeAuth}>
           Login with Youtube
         </button>
         {/if}
-      </div>
 
-      <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
-      on:click={fetchPlaylist}>
-        Get Playlists
-      </button>
     <!-- Display Playlists -->
   <div class="space-y-4 w-full text-center">
     {#if playlists.length > 0}
