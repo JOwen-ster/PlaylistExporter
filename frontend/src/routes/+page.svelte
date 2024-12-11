@@ -37,7 +37,7 @@
   }
   function spotifyLog() {
     spotifyResponse = "Logged In";
-    spotifyLogin = true;
+    spotifyLogin = "true";
   }
 
   async function submitSpotifyPlaylist() {
@@ -119,7 +119,7 @@
       <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Selected Playlist: {playlistSelected}</p>
       
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
-      on:click={fetchPlaylist}>
+      on:click={() => {fetchPlaylist(), spotifyLog()}}>
         Get Playlists
       </button>
       {#if spotifyLogin == "true"}
