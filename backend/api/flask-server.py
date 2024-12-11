@@ -43,6 +43,7 @@ playlistsSpotify = ["happy", "zcool playlist", "bears", "Wizard of oz"]
 songsForYoutube = []
 youtubeIds = []
 playlistName = ""
+credentials = None
 
 CORS(app, supports_credentials=True)  # Need to add this and CORS import to run flask server along with sveltekit 
 
@@ -87,6 +88,7 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
+    global credentials
     # Specify the state when creating the flow in the callback so that it can
     # verify the authorization server response.
     state = flask.session['state']
@@ -110,11 +112,14 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.redirect("http://localhost:5173/")
+    return flask.redirect("/PlaylistExporter")
 
 @app.route("/PlaylistExporter")
 def playlistExporter():
+    global credentials
     # call playlist scraper spotify only function
+    if "credentials" not in flask.session:
+        return flask.redirect("/authorize")  # Redirect user to authenticate
 
     # Load the credentials from the session.
     credentials = google.oauth2.credentials.Credentials(**flask.session["credentials"])
@@ -128,7 +133,7 @@ def playlistExporter():
         youtube_manager = YouTubeMutator(youtube_instance)
 
     created_playlist = youtube_manager.createUserPlaylist(playlist_name=playlistName)
-    YouTubeMutator.exportLinks(created_playlist, youtubeIds)
+    YouTubeMutator.exportLinks(created_playlist, youtubeIds) # error
     
     youtube_manager.addSongToUserPlaylist(
         playlist_object=youtube_manager.getUserPlaylist(playlist_name=playlistName),
