@@ -152,13 +152,17 @@ def loginSpotify():
     playlistsSpotify = spotify.login_user()
     return flask.redirect("http://localhost:5173/")
 
+
 @app.route("/getPlaylists", methods=['GET'])
 def fetch_spotify_playlist():
     try:
-        # Example logic
-        return jsonify({"playlists": playlistsSpotify})
+        # Check if playlistsSpotify is empty or not loaded
+        if not playlistsSpotify:
+            raise ValueError("No playlists available. Please log in to Spotify first.")
+        return jsonify({"playlists": list(playlistsSpotify)})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Failed to fetch playlists: {str(e)}"}), 500
+
     
 @app.route("/getSongs", methods=['POST'])
 def spotify_playlist():

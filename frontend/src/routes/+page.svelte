@@ -10,8 +10,8 @@
       const response = await fetch(`http://localhost:8090/getPlaylists`, { method: 'GET' });
       if (response.ok) {
         const data = await response.json();
-        output = JSON.stringify(data, null, 2); // Properly format and display the JSON response
-        playlists = data.playlists;
+        playlists = data.playlists || []; // Default to an empty array
+        output = JSON.stringify(data, null, 2);
       } else {
         output = `Error: ${response.status} ${response.statusText}`;
       }
@@ -19,6 +19,7 @@
       output = `Fetch failed: ${error.message}`;
     }
   }
+
 
   async function youtubeAuth() {
     try {
@@ -102,23 +103,29 @@
       Start Converting Your Playlists from Spotify to YouTube
     </p>
     <div class="flex flex-col items-center space-y-4">
-      <button  
-         class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 m-5 rounded hover:bg-green-600"
-         on:click={spotifyAuth}>
-        {spotifyResponse}
-      </button>
-      <button  
-         class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
-         on:click={youtubeAuth}>
-        Login with Youtube
-      </button>
+
+      <div class="flex flex-row gap-3">
+        <button  
+          class="md:text-2xl text-center text-white bg-green-500 py-2 px-4 rounded hover:bg-green-600"
+          on:click={spotifyAuth}>
+          {spotifyResponse}
+        </button>
+        <button  
+          class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
+          on:click={youtubeAuth}>
+          Login with Youtube
+        </button>
+      </div>
+
       <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
       on:click={fetchPlaylist}>
         Get Playlists
       </button>
       <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Playlist Selected: {playlistSelected}</p>
-      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
-      <!-- Form to accept Spotify Playlist URL -->
+      <!--
+        <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Output: {output}</p>
+      -->
+      <!-- Form to accept Spotify Playlist URL 
       <div class="space-y-4">
         <input
           type="text"
@@ -134,22 +141,26 @@
         </button>
       </div>
     </div>
+    -->
+
+
     <!-- Display Playlists -->
     <div class="space-y-4 w-full text-center">
       {#if playlists.length > 0}
-        <ul class="space-y-2">
+        <select 
+          class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded w-48"
+          on:change={(event) => handlePlaylistClick(event.target.value)}
+        >
+          <option disabled selected>Select a playlist</option>
           {#each playlists as playlist}
-            <li 
-              class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
-              on:click={() => handlePlaylistClick(playlist)}>
-              {playlist}
-            </li>
+            <option value={playlist}>{playlist}</option>
           {/each}
-        </ul>
+        </select>
       {:else}
         <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
       {/if}
     </div>
+    
     <button
           on:click={() => submitPlaylist(playlistSelected)}
           class="md:text-2xl text-center text-white bg-blue-500 py-2 px-4 rounded hover:bg-blue-600"
