@@ -135,7 +135,7 @@ def playlistExporter():
         url="https://www.youtube.com/watch?v=-OkrC6h2H5k",
     )
 
-    view = youtube_manager.getUserPlaylist("TESTING_API")
+    view = youtube_manager.getUserPlaylist(playlistName)
     youtube_manager.updateUserPlaylistInfo(playlist_object=view)
 
     response_data = {
