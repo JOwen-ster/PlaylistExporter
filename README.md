@@ -34,9 +34,9 @@ The app is designed to make the playlist conversion process as straightforward a
 ## How to Run the Project
 
 1. **Set Up Environment Variables**  
-   - Obtain Spotify Developer credentials (Client ID and Client Secret) from the [Spotify Developer Portal](https://developer.spotify.com/dashboard/).  
+   - Obtain YouTube credentials (Client ID and Client Secret) from the [Google Cloud Console](https://console.cloud.google.com/).
    - Generate a Google API Key from the [Google Cloud Console](https://console.cloud.google.com/).
-   - Obtain YouTube credentials (Client ID and Client Secret) from the [Google Cloud Console](https://console.cloud.google.com/).  
+   - Obtain Spotify Developer credentials (Client ID and Client Secret) from the [Spotify Developer Portal](https://developer.spotify.com/dashboard/).    
    - Create a `.env` file in the root directory using the format in `env.example`:
      ```env
      clientID="🩷"
