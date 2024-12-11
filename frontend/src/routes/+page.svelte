@@ -99,12 +99,12 @@
 </script>
 
 
-<main class="flex flex-col justify-between h-screen">
+<main class="flex flex-col justify-between h-screen m-5">
   <div>
-    <h1 class="text-center text-3xl md:text-6xl mt-8 text-[#1C873E] font-medium">
+    <h1 class="text-center text-3xl md:text-6xl mt-8 text-[#9AFFBA] font-medium">
       Welcome to Playlist Exporter!
     </h1>
-    <p class="text-center text-xl md:text-2xl mt-5 text-[#7e7C7C] mb-6">
+    <p class="text-center text-xl md:text-2xl mt-5 text-white mb-6">
       Start Converting Your Playlists from Spotify to YouTube
     </p>
     <div class="flex flex-col items-center space-y-4">
@@ -116,12 +116,18 @@
           {spotifyResponse}
         </button>
       </div>
-      <p class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600">Selected Playlist: {playlistSelected}</p>
+
+      <div class="flex flex-row gap-3">
       
-      <button class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
-      on:click={() => {fetchPlaylist(), spotifyLog()}}>
-        Get Playlists
-      </button>
+        <button class="md:text-2xl text-center text-black bg-white py-2 px-4 rounded hover:bg-[#9AFFBA] mt-10"
+        on:click={() => {fetchPlaylist(), spotifyLog()}}>
+          Get Playlists
+        </button>
+
+        <p class="md:text-2xl text-center text-white py-2 px-4 mt-10 ">Selected Playlist: {playlistSelected}</p>
+      </div>
+
+
       {#if spotifyLogin == "true"}
         <button  
           class="md:text-2xl text-center text-white bg-red-500 py-2 px-4 rounded hover:bg-red-600"
@@ -131,22 +137,23 @@
         {/if}
 
     <!-- Display Playlists -->
-  <div class="space-y-4 w-full text-center">
-    {#if playlists.length > 0}
-      <ul class="space-y-2">
-        {#each playlists as playlist}
-          <li 
-            class="cursor-pointer bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
-            on:click={() => handlePlaylistClick(playlist)}>
-            {playlist}
-          </li>
-        {/each}
-      </ul>
-    {:else}
-      <p class="text-gray-500">No playlists available. Fetch playlists to display them.</p>
-    {/if}
+    <div class="space-y-4 w-full text-center">
+      {#if playlists.length > 0}
+        <ul class="space-y-2 flex flex-wrap justify-center gap-4">
+          {#each playlists as playlist}
+            <li 
+              class="cursor-pointer bg-white hover:bg-gray-300 px-5 py-5 w-64 h-12 rounded flex items-center justify-center"
+              on:click={() => handlePlaylistClick(playlist)}>
+              {playlist}
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="text-gray-500">No playlists available. Please login to fetch playlist</p>
+      {/if}
+    </div>
+    
 
-  </div>
     
     <button
           on:click={(event) => submitPlaylist(playlistSelected)}
@@ -157,8 +164,8 @@
 
     <div> 
   </div>
-
-  <div class="text-center">
+<!--
+  <div class="text-center absolute bottom-0">
     <p class="md:text-xl text-[#FFAAAA] mb-4">
       Here is a song recommendation while you login!
     </p>
@@ -172,11 +179,13 @@
       title="Spotify Song Player">
     </iframe>
   </div>
+
+  -->
 </main>
 
 <style>
   :global(body) {
-    background-color: black;
+    background-color: #181818;
     font-family: "Alegreya Sans", sans-serif;
   }
 </style>
